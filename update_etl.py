@@ -79,8 +79,13 @@ def main():
         rodada = df_atletas['atletas.rodada_id'][0]
         df_partidas = gerar_df_partidas(rodada)
         df_final = gerar_df_mergeado(df_partidas, df_atletas)
-        df_final.to_csv(f'data/rodadas/rodada-{rodada}.csv')
-        
+        if df_final['atletas.rodada_id'][-1] == rodada:
+            print('Rodada já existe na base de dados.')
+        else:
+            df_final.to_csv(f'data/rodadas/rodada-{rodada}.csv')
+            df_consolidado = pd.read_csv('data/consolidado')
+            df_consolidado = pd.concat([df_consolidado, df_final]).sort_values('atletas.rodada_id')
+            df_consolidado.to_csv('data/consolidado.csv', index=False)
 
 if __name__ == '__main__':
     main()
