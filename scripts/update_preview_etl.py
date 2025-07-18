@@ -1,5 +1,7 @@
 import requests
 import pandas as pd 
+import constants as c
+import joblib 
 
 def cartola_api(endpoint):
     url = "https://api.cartola.globo.com/" + endpoint 
@@ -51,7 +53,8 @@ def gerar_df_atletas():
 
 
 def gerar_df_partidas(rodada):
-    df_partidas = pd.DataFrame(cartola_api(f'partidas/{rodada}')['partidas'])
+    data = cartola_api(f'partidas/{rodada}')
+    df_partidas = pd.DataFrame(data['partidas'])
     df_partidas = df_partidas.drop(columns=['transmissao', 'status_transmissao_tr', 'periodo_tr',
                                             'status_cronometro_tr', 'inicio_cronometro_tr']) #drop useless columns
     df_partidas['aproveitamento_mandante'] = df_partidas['aproveitamento_mandante'].apply(calculo_aproveitamento)
@@ -79,14 +82,28 @@ def calculo_aproveitamento(aproveitamento: list) -> int:
 def main():
     if status_mercado:
         df_atletas = gerar_df_atletas()
-        rodada = df_atletas['atletas.rodada_id'][0]
+        rodada = df_atletas['atletas.rodada_id'][0] + 1
+        df_atletas['atletas.rodada_id'] = rodada 
         df_partidas = gerar_df_partidas(rodada)
-        df_final = gerar_df_mergeado(df_partidas, df_atletas)
-        df_final.to_csv(f'data/real/rodada-{rodada}.csv')
-        df_consolidado = pd.read_csv(f'data/real/consolidado.csv')
-        df_consolidado = pd.concat([df_consolidado, df_final]).sort_values('atletas.rodada_id')
+        df_atletas_partidas_merged = gerar_df_mergeado(df_partidas, df_atletas)
+        df_full = pd.read_csv('data/real/consolidado.csv')
+        df_full = pd.concat([df_full, df_atletas_partidas_merged])
+        df_rodada = df_full[df_full['atletas.rodada_id']== rodada].copy()
+        df_full = df_full[df_full['atletas.rodada_id'] < rodada]
+        media_historica_por_atleta = df_full.groupby('atletas.atleta_id')['atletas.pontos_num'].mean()
+        df_rodada['atletas.pontos_num'] = media_historica_por_atleta
+        df_rodada_predictions = df_rodada[c.COLS_TRAIN].copy()
+        df_rodada_predictions.drop(columns = [c.COLS_CUTOUT, c.COLS_TARGET], inplace=True)
 
-        df_consolidado.to_csv(f'data/real/consolidado.csv', index=False)
+        forest = joblib.load('models/pontos_preview.joblib')
+        predictions = forest.predict(df_rodada_predictions)
+        df_rodada_predictions['previsao_pontos'] = predictions
+        df_rodada_predictions = df_rodada_predictions[['atletas.atleta_id', 'previsao_pontos']]
+        df_rodada_predictions = df_rodada_predictions.merge(df_rodada, on='atletas.atleta_id')
+        df_rodada_predictions.sort_values(by='previsao_pontos', ascending=False, inplace=True)
+        df_rodada_predictions.to_csv(f'data/previews/rodada_{rodada}.csv', index=False)
+
+
 
 if __name__ == '__main__':
     main()
