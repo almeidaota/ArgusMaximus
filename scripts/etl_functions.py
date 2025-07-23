@@ -1,6 +1,7 @@
 import requests
 import pandas as pd 
 
+
 def cartola_api(endpoint):
     url = "https://api.cartola.globo.com/" + endpoint 
     response = requests.get(f'{url}')
@@ -70,23 +71,6 @@ def gerar_df_mergeado(df_partidas, df_atletas):
 
 def calculo_aproveitamento(aproveitamento: list) -> int:
     vitorias = aproveitamento.count('v')
-    derrotas = aproveitamento.count('d')
     empates = aproveitamento.count('e')
     aproveitamento = (vitorias*3 + empates*1) / (5 * 3) * 100
     return round(aproveitamento, 2)
-
-
-def main():
-    if status_mercado:
-        df_atletas = gerar_df_atletas()
-        rodada = df_atletas['atletas.rodada_id'][0]
-        df_partidas = gerar_df_partidas(rodada)
-        df_final = gerar_df_mergeado(df_partidas, df_atletas)
-        df_final.to_csv(f'data/real/rodada-{rodada}.csv')
-        df_consolidado = pd.read_csv(f'data/real/consolidado.csv')
-        df_consolidado = pd.concat([df_consolidado, df_final]).sort_values('atletas.rodada_id')
-
-        df_consolidado.to_csv(f'data/real/consolidado.csv', index=False)
-
-if __name__ == '__main__':
-    main()
