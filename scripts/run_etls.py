@@ -21,10 +21,12 @@ def generate_preview_data():
 
     df_atletas_partidas_merged = ef.gerar_df_mergeado(df_partidas, df_atletas)
     df_full = pd.read_csv('data/real/consolidado.csv')
+    df_atletas_partidas_merged = ef.media_scout(df_atletas_partidas_merged, df_full)
     df_full = pd.concat([df_full, df_atletas_partidas_merged])
+
     df_rodada = df_full[df_full[c.RODADA_ID]== rodada].copy()
     df_full = df_full[df_full[c.RODADA_ID] < rodada]
-    
+
     media_historica_por_atleta = df_full.groupby(c.ATLETAS_ID)[c.PONTOS_NUM].mean()
     df_rodada[c.PONTOS_NUM] = media_historica_por_atleta
     df_rodada_predictions = df_rodada[c.COLS_TRAIN].copy()

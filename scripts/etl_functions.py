@@ -1,6 +1,6 @@
 import requests
 import pandas as pd 
-
+import constants as c
 
 def cartola_api(endpoint):
     url = "https://api.cartola.globo.com/" + endpoint 
@@ -74,3 +74,31 @@ def calculo_aproveitamento(aproveitamento: list) -> int:
     empates = aproveitamento.count('e')
     aproveitamento = (vitorias*3 + empates*1) / (5 * 3) * 100
     return round(aproveitamento, 2)
+
+def media_scout(df_preview, df_historical):
+    df_preview_ids = df_preview[[c.ATLETAS_ID, c.RODADA_ID]].copy()
+    df_combinado = pd.concat([df_historical, df_preview_ids], ignore_index=True)
+    df_combinado.drop_duplicates(subset=[c.ATLETAS_ID, c.RODADA_ID], keep='last', inplace=True)
+
+    colunas_media_criadas = [c.ATLETAS_ID, c.RODADA_ID]
+    for column in c.SCOUT:
+        nova_coluna = f'media_{column}_5_rodadas'
+        colunas_media_criadas.append(nova_coluna)
+        
+        serie_media = df_combinado.groupby(c.ATLETAS_ID)[column].rolling(
+            window=5, min_periods=1
+        ).mean().shift(1)
+
+        df_combinado[nova_coluna] = serie_media.reset_index(level=0, drop=True)
+
+    
+    df_final = pd.merge(
+        df_preview,
+        df_combinado[colunas_media_criadas],
+        on=[c.ATLETAS_ID, c.RODADA_ID],
+        how='left'
+    )
+    
+    df_final[colunas_media_criadas] = df_final[colunas_media_criadas].fillna(0)
+
+    return df_final
