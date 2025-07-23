@@ -10,3 +10,7 @@ COLS_TARGET = 'atletas.pontos_num'
 
 COLS_CUTOUT = 'atletas.rodada_id'
 TEST_CUTOUT = 12
+RODADA_ID = 'atletas.rodada_id'
+ATLETAS_ID = 'atletas.atleta_id'
+PONTOS_NUM = 'atletas.pontos_num'
+PREVISAO_PONTOS = 'previsao_pontos'
