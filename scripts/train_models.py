@@ -4,13 +4,11 @@ from sklearn.metrics import mean_absolute_error, r2_score
 import joblib 
 import constants as c
 import etl_functions as ef
-import time 
 def montar_analise_dados(df):
     for column in c.SCOUT:
         nova_coluna = f'media_{column}_5_rodadas'
         series_media = df.groupby(c.ATLETAS_ID)[column].rolling(window=5, min_periods=1).mean().shift(1)
         df[nova_coluna] = series_media.reset_index(level=0, drop=True)
-    print(df)
     return df
 
 if __name__ == '__main__':
@@ -32,9 +30,6 @@ if __name__ == '__main__':
         num_leaves=31,
         random_state=42,
         n_jobs=-1,
-        # Você pode adicionar outros parâmetros para otimização
-        # colsample_bytree=0.8,
-        # subsample=0.8
     )
     print(x_train.columns)
     forest.fit(x_train, y_train)
