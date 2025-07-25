@@ -12,7 +12,7 @@ COLS_TRAIN = ['atletas.rodada_id', 'atletas.status_id', 'atletas.pontos_num',
 COLS_TARGET = 'atletas.pontos_num'
 
 COLS_CUTOUT = 'atletas.rodada_id'
-TEST_CUTOUT = 12
+TEST_CUTOUT = 13
 RODADA_ID = 'atletas.rodada_id'
 ATLETAS_ID = 'atletas.atleta_id'
 PONTOS_NUM = 'atletas.pontos_num'
