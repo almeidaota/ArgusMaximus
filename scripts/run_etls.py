@@ -51,10 +51,9 @@ def generate_preview_data():
 
 
 if __name__ == '__main__':
-    #status_mercado = ef.status_mercado()
-    status_mercado = True
+    status_mercado = ef.status_mercado()
     if status_mercado:
         generate_historical_data()
         generate_preview_data()
-    #else:
-        #print('Mercado fechado. Volte outro dia.')
+    else:
+        print('Mercado fechado. Volte outro dia.')
