@@ -1,6 +1,5 @@
 # Argus Maximus 
 
-**Um projeto pessoal em desenvolvimento para criar um olheiro com Inteligência Artificial para o Cartola FC, com o objetivo de montar o time ótimo e maximizar a pontuação a cada rodada.**
 
 ![Status](https://img.shields.io/badge/status-em_desenvolvimento-yellow)
 
@@ -32,24 +31,23 @@ O resultado esperado é a escalação matematicamente ótima, o time que, segund
 
 ## Fonte dos Dados Históricos e Agradecimentos
 
-A qualidade de um modelo de IA depende diretamente da qualidade dos dados utilizados para treiná-lo.
-
 Os dados históricos essenciais para o treinamento dos modelos (rodadas 1 a 12) foram generosamente compilados e disponibilizados por **Henrique P. Gomide** em seu incrível projeto:
 
 **[caRtola - A Consolidated Database of the Brazilian Football League](https://github.com/henriquepgomide/caRtola)**
 
 Deixo aqui meu muito obrigado pela sua contribuição. Recomendo fortemente que visitem o repositório dele e deixem uma estrela.
 
-Os dados da rodada 12 em diante foram feitos usando o script situado em scripts/update_etl.py
+Os dados da rodada 12 em diante foram feitos usando o script situado em scripts//run_etls.py
 
 ## Roadmap de Desenvolvimento
 
 Este projeto está em andamento. Abaixo estão os próximos passos planejados:
 -   [X] **Montagem da Base:** Montar uma base consolidada com os dados de rodadas anteriores - e atualizar conforme se passam
--   [ ] **Modelagem:** Treinar e validar diferentes modelos de regressão (XGBoost, LightGBM, Redes Neurais).
+-   [X] **Modelagem:** Treinar Modelo
 -   [ ] **Backtesting:** Implementar um framework de backtesting para validar a eficácia do modelo em rodadas passadas.
 -   [ ] **Automação:** Orquestrar o update_etl.py para rodar automaticamente a cada semana.
--   [ ] **Engenharia de Features:** Adicionar mais variáveis aos modelos (ex: dados de casas de aposta, condições climáticas).
 
-Acompanhe as atualizações e commits para ver o progresso!
+## Desenvolvimento constante:
+
+-   [ ] **Engenharia de Features:** Adicionar mais variáveis aos modelos (ex: dados de casas de aposta, condições climáticas).
 
