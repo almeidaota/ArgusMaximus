@@ -4,6 +4,9 @@ from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 import docker 
+from docker.types import Mount
+
+
 
 default_args = {
     'owner': 'airflow',
@@ -38,6 +41,13 @@ with DAG(
     tags=['argus', 'docker', 'ec2'],
 ) as dag:
 
+    resultado_mount = Mount(
+        target="/app/argus/data", 
+        source="/home/ec2-user/argus/ArgusMaximus", 
+        type="bind"
+    )
+
+
     task_run_etls = DockerOperator(
         task_id='run_etls',
         image='argus-project:latest',  
@@ -46,7 +56,8 @@ with DAG(
         command="python scripts/run_etls.py", 
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge",
-        mount_tmp_dir=False
+        mount_tmp_dir=False,
+        mounts=[resultado_mount]
     )
 
     task_train_models = DockerOperator(
@@ -57,7 +68,8 @@ with DAG(
         command="python scripts/train_models.py", 
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge",
-        mount_tmp_dir=False
+        mount_tmp_dir=False,
+        mounts=[resultado_mount]
     )
 
     task_shutdown_instance = PythonOperator(
