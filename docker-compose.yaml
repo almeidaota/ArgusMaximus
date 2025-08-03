@@ -42,8 +42,10 @@ services:
         condition: service_completed_successfully
     ports:
       - "8080:8080"
-    volumes: 
+    volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    group_add: 
+      - "${DOCKER_GID}"
     env_file:
       - .env
     environment:
@@ -64,7 +66,9 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - /var/run/docker.sock:/var/run/docker.sock 
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add: 
+      - "${DOCKER_GID}"
     env_file:
       - .env
     environment:
