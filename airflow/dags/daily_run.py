@@ -63,6 +63,7 @@ with DAG(
     task_shutdown_instance = PythonOperator(
         task_id='shutdown_ec2_instance',
         python_callable=shutdown_ec2_instance,
+        trigger_rule='all_done'
     )
 
-    task_run_etls >> task_train_models >> task_shutdown_instance
+    [task_run_etls >> task_train_models] >> task_shutdown_instance
