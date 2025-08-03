@@ -12,17 +12,13 @@ x-airflow-common: &airflow-common
   user: "${AIRFLOW_UID:-50000}"
 
 services:
-  airflow-init:
-    <<: *airflow-common
-    container_name: airflow_init
-    entrypoint: /bin/bash
-    command:
-      - -c
-      - |
-        mkdir -p /sources/logs /sources/dags /sources/plugins
-        chown -R "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-0}" /sources
-        exec /entrypoint airflow db init
-
+airflow-init:
+  <<: *airflow-common
+  container_name: airflow_init
+  entrypoint: /bin/bash
+  command:
+    - -c
+    - exec /entrypoint airflow db init
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow_webserver
