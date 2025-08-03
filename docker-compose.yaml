@@ -1,26 +1,37 @@
-x-airflow-common: &airflow-common
-  image: apache/airflow:2.9.2
-  environment:
-    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    - AIRFLOW__CORE__LOAD_EXAMPLES=false
-    - AIRFLOW__CORE__ENABLE_XCOM_PICKLING=True
-  volumes:
-    - ./airflow/dags:/opt/airflow/dags
-    - ./airflow/logs:/opt/airflow/logs
-    - ./airflow/plugins:/opt/airflow/plugins
-  user: "${AIRFLOW_UID:-50000}"
-
 services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+
   airflow-init:
-    <<: *airflow-common
+    image: apache/airflow:2.9.2
     container_name: airflow_init
-    entrypoint: /bin/bash
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
     command:
       - -c
-      - exec /entrypoint airflow db migrate
+      - airflow db migrate && airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
 
   airflow-webserver:
-    <<: *airflow-common
+    image: apache/airflow:2.9.2
     container_name: airflow_webserver
     restart: always
     depends_on:
@@ -28,13 +39,28 @@ services:
         condition: service_completed_successfully
     ports:
       - "8080:8080"
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
     command: airflow webserver
 
   airflow-scheduler:
-    <<: *airflow-common
+    image: apache/airflow:2.9.2
     container_name: airflow_scheduler
     restart: always
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    environment:
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
     command: airflow scheduler
+
+volumes:
+  postgres-db-volume:
