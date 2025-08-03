@@ -22,11 +22,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    env_file:
+      - .env
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__LOAD_EXAMPLES=false
-    entrypoint: /bin/bash  # <-- ESTA É A CORREÇÃO
+    entrypoint: /bin/bash
     command:
       - -c
       - airflow db migrate && airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin
@@ -40,6 +42,8 @@ services:
         condition: service_completed_successfully
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
@@ -57,6 +61,8 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
+    env_file:
+      - .env
     environment:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
