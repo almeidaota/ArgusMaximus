@@ -17,7 +17,7 @@ services:
     entrypoint: /bin/bash
     command:
       - -c
-      - exec /entrypoint airflow db init
+      - exec /entrypoint airflow db migrate
 
   airflow-webserver:
     <<: *airflow-common
