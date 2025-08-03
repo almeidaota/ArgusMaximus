@@ -1,4 +1,3 @@
-version: '3'
 x-airflow-common: &airflow-common
   image: apache/airflow:2.9.2
   environment:
@@ -12,13 +11,14 @@ x-airflow-common: &airflow-common
   user: "${AIRFLOW_UID:-50000}"
 
 services:
-airflow-init:
-  <<: *airflow-common
-  container_name: airflow_init
-  entrypoint: /bin/bash
-  command:
-    - -c
-    - exec /entrypoint airflow db init
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - exec /entrypoint airflow db init
+
   airflow-webserver:
     <<: *airflow-common
     container_name: airflow_webserver
@@ -26,7 +26,6 @@ airflow-init:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
-
     ports:
       - "8080:8080"
     command: airflow webserver
@@ -38,5 +37,4 @@ airflow-init:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
-
     command: airflow scheduler
