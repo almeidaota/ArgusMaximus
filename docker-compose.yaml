@@ -24,7 +24,9 @@ airflow-init:
     container_name: airflow_webserver
     restart: always
     depends_on:
-      - airflow-init
+      airflow-init:
+        condition: service_completed_successfully
+
     ports:
       - "8080:8080"
     command: airflow webserver
@@ -34,5 +36,7 @@ airflow-init:
     container_name: airflow_scheduler
     restart: always
     depends_on:
-      - airflow-init
+      airflow-init:
+        condition: service_completed_successfully
+
     command: airflow scheduler
