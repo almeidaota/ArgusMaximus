@@ -42,7 +42,7 @@ with DAG(
 ) as dag:
 
     resultado_mount = Mount(
-        target="/app/argus", 
+        target="/app/argus/data", 
         source="/home/ec2-user/argus/ArgusMaximus/argus/data", 
         type="bind"
     )
