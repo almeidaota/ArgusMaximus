@@ -3,7 +3,6 @@ from airflow.models.dag import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
-import docker 
 from docker.types import Mount
 
 
@@ -15,12 +14,8 @@ default_args = {
 }
 
 def shutdown_ec2_instance():
-    """
-    Usa o boto3 para obter o ID da instância atual e desligá-la.
-    Isso requer que a instância EC2 tenha uma IAM Role com a permissão ec2:StopInstances.
-    """
     try:
-        instance_id = boto3.utils.get_instance_metadata()['instance-id']
+        instance_id = boto3.botocore.utils.get_instance_metadata()['instance-id']
         print(f"Encontrado o ID da instância: {instance_id}")
         
         ec2_client = boto3.client('ec2', region_name='us-east-1') 
