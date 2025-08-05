@@ -1,4 +1,5 @@
 import boto3
+import botocore.utils
 from airflow.models.dag import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.operators.python import PythonOperator
@@ -15,7 +16,7 @@ default_args = {
 
 def shutdown_ec2_instance():
     try:
-        instance_id = boto3.botocore.utils.get_instance_metadata()['instance-id']
+        instance_id = botocore.utils.get_instance_metadata()['instance-id']
         print(f"Encontrado o ID da instância: {instance_id}")
         
         ec2_client = boto3.client('ec2', region_name='us-east-1') 
