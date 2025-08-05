@@ -1,10 +1,10 @@
 import boto3
-import botocore.utils
 from airflow.models.dag import DAG
 from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from docker.types import Mount
+import requests
 
 
 
@@ -14,13 +14,31 @@ default_args = {
     'retries': 1,
 }
 
+def get_ec2_id(ec2_client):
+    response = ec2_client.describe_instances()
+    instance_details = []
+
+    for reservation in response['Reservations']:
+        for instance in reservation['Instances']:
+            instance_type = instance['InstanceType']
+
+            instance_name = 'N/A'
+            if 'Tags' in instance:
+                for tag in instance['Tags']:
+                    if tag['Key'] == 'Name':
+                        instance_name = tag['Value']
+                        if instance_name == 'argusmaximus':
+                            instance_id = instance['InstanceId']
+                            return instance_id
+    raise Exception('Theres no instance id with argusmaximus name')
+
 def shutdown_ec2_instance():
     try:
-        instance_id = botocore.utils.get_instance_metadata()['instance-id']
+        
+        ec2_client = boto3.client('ec2', region_name='sa-east-1') 
+        instance_id = get_ec2_id(ec2_client)
         print(f"Encontrado o ID da instância: {instance_id}")
-        
-        ec2_client = boto3.client('ec2', region_name='us-east-1') 
-        
+
         print(f"Enviando comando para desligar a instância {instance_id}...")
         ec2_client.stop_instances(InstanceIds=[instance_id])
         print("Comando de desligamento enviado com sucesso.")
