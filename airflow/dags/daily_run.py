@@ -36,12 +36,17 @@ with DAG(
     tags=['argus', 'docker', 'ec2'],
 ) as dag:
 
-    resultado_mount = Mount(
+    data_mount = Mount(
         target="/app/argus/data", 
         source="/home/ec2-user/argus/ArgusMaximus/argus/data", 
         type="bind"
     )
 
+    models_mount = Mount(
+        target="/app/argus/models",
+        source ="/home/ec2-user/argus/ArgusMaximus/argus/models",
+        type='bind'
+    )
 
     task_run_etls = DockerOperator(
         task_id='run_etls',
@@ -53,7 +58,7 @@ with DAG(
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge",
         mount_tmp_dir=False,
-        mounts=[resultado_mount]
+        mounts=[data_mount, models_mount]
     )
 
     task_train_models = DockerOperator(
@@ -66,7 +71,7 @@ with DAG(
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge",
         mount_tmp_dir=False,
-        mounts=[resultado_mount]
+        mounts=[data_mount, models_mount]
     )
 
     task_shutdown_instance = PythonOperator(
