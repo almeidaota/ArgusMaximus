@@ -1,3 +1,6 @@
+import os 
+from pathlib import Path
+
 COLS_TRAIN = ['atletas.rodada_id', 'atletas.status_id', 'atletas.pontos_num',
        'atletas.media_num', 'atletas.atleta_id',
        'atletas.posicao_id',
@@ -19,3 +22,12 @@ PONTOS_NUM = 'atletas.pontos_num'
 PREVISAO_PONTOS = 'previsao_pontos'
 
 SCOUT = ['CA','DS','FC','FF','FS','I','SG','FD','A','G','CV','FT','PC','PS','DE','GS','V','DP','PP','GC']
+
+if os.getenv('APP_ENV') == 'docker':
+    PROJECT_ROOT = 'app/argus'
+else:
+    PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+DATA_PATH = f'{PROJECT_ROOT}/data'
+PREVIEWS_PATH = f'{PROJECT_ROOT}/previews'
+MODELS_PATH = f'{PROJECT_ROOT}/previews'
