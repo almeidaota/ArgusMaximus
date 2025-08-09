@@ -1,4 +1,11 @@
 services:
+  argus-app:
+    image: argus-project:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["echo", "Imagem 'argus-project' construída. Este contêiner não fará mais nada."]
+
   postgres:
     image: postgres:13
     container_name: postgres
@@ -22,7 +29,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    build: .
     env_file:
       - .env
     environment:
