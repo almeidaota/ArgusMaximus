@@ -29,5 +29,6 @@ else:
     PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 DATA_PATH = f'{PROJECT_ROOT}/data'
-PREVIEWS_PATH = f'{PROJECT_ROOT}/previews'
-MODELS_PATH = f'{PROJECT_ROOT}/previews'
+PREVIEWS_PATH = f'{DATA_PATH}/previews'
+DATA_REAL_PATH = f'{DATA_PATH}/real'
+MODELS_PATH = f'{PROJECT_ROOT}/models'
