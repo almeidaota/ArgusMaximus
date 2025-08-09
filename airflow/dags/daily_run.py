@@ -4,9 +4,6 @@ from airflow.providers.docker.operators.docker import DockerOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from docker.types import Mount
-import requests
-
-
 
 default_args = {
     'owner': 'airflow',
@@ -16,11 +13,9 @@ default_args = {
 
 def get_ec2_id(ec2_client):
     response = ec2_client.describe_instances()
-    instance_details = []
 
     for reservation in response['Reservations']:
         for instance in reservation['Instances']:
-            instance_type = instance['InstanceType']
 
             instance_name = 'N/A'
             if 'Tags' in instance:
@@ -67,12 +62,12 @@ with DAG(
         type='bind'
     )
 
-    task_run_etls = DockerOperator(
+    task_run_argus = DockerOperator(
         task_id='run_etls',
         image='argus-project:latest',  
         api_version='auto',
         auto_remove=True,
-        command="python scripts/run_etls.py", 
+        command="python scripts/main.py", 
         working_dir="/app/argus",
         docker_url="unix://var/run/docker.sock",
         network_mode="bridge",
@@ -80,18 +75,6 @@ with DAG(
         mounts=[data_mount, models_mount]
     )
 
-    task_train_models = DockerOperator(
-        task_id='train_models',
-        image='argus-project:latest', 
-        api_version='auto',
-        auto_remove=True,
-        working_dir="/app/argus",
-        command="python scripts/train_models.py", 
-        docker_url="unix://var/run/docker.sock",
-        network_mode="bridge",
-        mount_tmp_dir=False,
-        mounts=[data_mount, models_mount]
-    )
 
     task_shutdown_instance = PythonOperator(
         task_id='shutdown_ec2_instance',
@@ -99,4 +82,4 @@ with DAG(
         trigger_rule='all_done'
     )
 
-    [task_run_etls >> task_train_models] >> task_shutdown_instance
+    [task_run_argus] >> task_shutdown_instance
