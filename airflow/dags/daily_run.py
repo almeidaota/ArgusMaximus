@@ -12,6 +12,7 @@ default_args = {
 }
 
 def get_ec2_id(ec2_client):
+    """get id from argusmaximus instance"""
     response = ec2_client.describe_instances()
 
     for reservation in response['Reservations']:
@@ -28,6 +29,7 @@ def get_ec2_id(ec2_client):
     raise Exception('Theres no instance id with argusmaximus name')
 
 def shutdown_ec2_instance():
+    """shutdown ec2 instance"""
     try:
         
         ec2_client = boto3.client('ec2', region_name='sa-east-1') 

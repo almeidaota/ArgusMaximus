@@ -13,6 +13,10 @@ logging.basicConfig(
 )
 
 def generate_historical_data():
+    """Generate historical data, merging from endpoint atletas and partidas,
+
+      Stores it on data/real directory"""
+    
     logging.info("[HISTORICAL DATA] Iniciando geração de dados históricos.")
     df_atletas = ef.gerar_df_atletas()
     rodada = df_atletas[settings.RODADA_ID][0]
@@ -38,6 +42,9 @@ def generate_historical_data():
         logging.warning(f"[HISTORICAL DATA] Rodada {rodada} já inclusa em data/real. Encerrando execução.") 
 
 def generate_preview_data():
+    """Generate a preview data, running our machine learning model,
+
+      Stores it on data/previews directory"""
 
     logging.info("[PREVIEW DATA] Iniciando geração de dados para previsão.")
     df_atletas = ef.gerar_df_atletas()

@@ -11,12 +11,14 @@ def cartola_api(endpoint):
 
 
 def status_mercado():
+    """get status_mercado. returns a boolean"""
     status_mercado = cartola_api('mercado/status')
     status_mercado = status_mercado['status_mercado']
     return True if status_mercado == 1 else False
 
 
 def rename_columns_df_atletas(df):
+    """rename all columns on the dataframe, appending a prefix from the endpoint atletas"""
     df.rename(columns={
     'apelido': 'atletas.apelido',
     'apelido_abreviado': 'atletas.apelido_abreviado',
@@ -39,6 +41,7 @@ def rename_columns_df_atletas(df):
 
 
 def gerar_df_atletas():
+    """generate df_atletas from cartola_api"""
     dados_atletas = cartola_api('atletas/mercado')
     df_atletas = pd.DataFrame(dados_atletas['atletas'])
     df_scouts = pd.json_normalize(df_atletas['scout'])
@@ -52,6 +55,7 @@ def gerar_df_atletas():
 
 
 def gerar_df_partidas(rodada):
+    """generate a match dataframe, from cartola_api"""
     df_partidas = pd.DataFrame(cartola_api(f'partidas/{rodada}')['partidas'])
     df_partidas = df_partidas.drop(columns=['transmissao', 'status_transmissao_tr', 'periodo_tr',
                                             'status_cronometro_tr', 'inicio_cronometro_tr']) #drop useless columns
@@ -61,6 +65,7 @@ def gerar_df_partidas(rodada):
     return df_partidas
 
 def gerar_df_mergeado(df_partidas, df_atletas):
+    "merge both dfs from generate df_partidas and generate df_atletas, returns a merged df"
     df_mandante = pd.merge(df_atletas, df_partidas, left_on='atletas.clube_id', right_on='clube_casa_id', how='inner')
     df_visitante = pd.merge(df_atletas, df_partidas, left_on='atletas.clube_id', right_on='clube_visitante_id', how='inner')
     df_mergeado = pd.concat([df_mandante, df_visitante])
@@ -70,12 +75,14 @@ def gerar_df_mergeado(df_partidas, df_atletas):
 
 
 def calculo_aproveitamento(aproveitamento: list) -> int:
+    """calculate the % of points a team got in the last 5 matches"""
     vitorias = aproveitamento.count('v')
     empates = aproveitamento.count('e')
     aproveitamento = (vitorias*3 + empates*1) / (5 * 3) * 100
     return round(aproveitamento, 2)
 
 def media_scout(df_preview, df_historical):
+    """calculates the mean from all scout numbers"""
     df_preview_ids = df_preview[[settings.ATLETAS_ID, settings.RODADA_ID]].copy()
     df_combinado = pd.concat([df_historical, df_preview_ids], ignore_index=True)
     df_combinado.drop_duplicates(subset=[settings.ATLETAS_ID, settings.RODADA_ID], keep='last', inplace=True)
