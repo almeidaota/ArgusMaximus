@@ -22,7 +22,7 @@ def montar_analise_dados(df):
     logging.info("[TRAINING MODEL] Criação de features de média móvel concluída.")
     return df
 
-if __name__ == '__main__':
+def train_model():
     logging.info("--- Iniciando script de treinamento de modelo ---")
 
     logging.info("[TRAINING MODEL] Lendo dados de 'data/real/consolidado.csv'.")

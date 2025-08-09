@@ -1,6 +1,7 @@
 import pandas as pd
 import pulp
 import time
+from pathlib import Path
 
 # --- FUNÇÃO DE OTIMIZAÇÃO PARA O TIME TITULAR (sem alterações) ---
 def otimizar_time(df_jogadores, custo_maximo, formacao, nome_problema="Otimizacao"):
@@ -68,13 +69,17 @@ def exibir_time(df_time, titulo):
 
 # --- Bloco Principal ---
 try:
-    df = pd.read_csv('data/previews/rodada-18.csv')
+    script_path = Path(__file__).resolve()
+    project_root = script_path.parent.parent
+    data_previews_path = f'{project_root}/data/previews'
+
+    df = pd.read_csv(f'{data_previews_path}/rodada-19.csv')
 except FileNotFoundError:
     print("Arquivo 'data/previews/rodada-17.csv' não encontrado.")
     exit()
 
 posicoes_map = {1: 'Goleiro', 2: 'Lateral', 3: 'Zagueiro', 4: 'Meia', 5: 'Atacante', 6: 'Técnico'}
-custo_total_disponivel = 106.10
+custo_total_disponivel = 107.56
 
 formacoes_validas = {
     "4-3-3": {1: 1, 2: 2, 3: 2, 4: 3, 5: 3, 6: 1}, "4-4-2": {1: 1, 2: 2, 3: 2, 4: 4, 5: 2, 6: 1},
